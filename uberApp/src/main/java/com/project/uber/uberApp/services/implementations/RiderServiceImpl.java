@@ -3,15 +3,13 @@ package com.project.uber.uberApp.services.implementations;
 import com.project.uber.uberApp.Entities.*;
 import com.project.uber.uberApp.Entities.enums.RideRequestStatus;
 import com.project.uber.uberApp.Entities.enums.RideStatus;
-import com.project.uber.uberApp.dto.DriverDto;
-import com.project.uber.uberApp.dto.RideDto;
-import com.project.uber.uberApp.dto.RideRequestDto;
-import com.project.uber.uberApp.dto.RiderDto;
+import com.project.uber.uberApp.dto.*;
 import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.project.uber.uberApp.repositories.RideRepository;
 import com.project.uber.uberApp.repositories.RideRequestRepository;
 import com.project.uber.uberApp.repositories.RiderRepository;
 import com.project.uber.uberApp.services.DriverService;
+import com.project.uber.uberApp.services.RatingService;
 import com.project.uber.uberApp.services.RideService;
 import com.project.uber.uberApp.services.RiderService;
 import com.project.uber.uberApp.strategies.DriverMatchingStrategy;
@@ -22,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,11 +41,13 @@ public class RiderServiceImpl implements RiderService {
     private final RiderRepository riderRepository;
     private final RideService rideService;
     private final DriverService driverService;
+    private final RatingService ratingService;
+    private final JWTService jwtService;
 
     @Override
     @Transactional//To maintain "Atomicity" -> Either Everything will execute or Nothing will execute.By Adding @Trans.
     //the whole method comes under a Transaction Context so if anything fails or goes Wrong then everything RollsBack.
-    public RideRequestDto requestRide(RideRequestDto rideRequestDto) {
+    public RideRequestDto requestRide(RideRequestDto rideRequestDto){
 
         RideRequest rideRequest = modelMapper.map(rideRequestDto,RideRequest.class);
 //      log.info(rideRequest.toString()); after putting the breakpoint we can to know that modelmapper is not able to fill the
@@ -101,7 +102,22 @@ public class RiderServiceImpl implements RiderService {
 
     @Override
     public DriverDto rateDriver(Long rideId, Integer rating) {
-        return null;
+
+        Ride ride = rideService.getRideById(rideId);
+
+        Rider currentRider = getCurrentRider();
+
+        //Checking if the currentDriver owns this ride or not , if not then Driver cannot rate this Rider.
+        if(!ride.getRider().equals(currentRider)){
+            throw new RuntimeException("Cannot give the rating as Driver doesn't own's this ride"+currentRider);
+        }
+
+        //If the ride is not ENDED then Rider cannot ride the Driver.
+        if(!ride.getRideStatus().equals(RideStatus.ENDED)){
+            throw new RuntimeException("Driver cannot rate the Rider as Ride is not yet Ended"+ride.getRideStatus());
+        }
+
+        return ratingService.RateDriver(ride,rating);
     }
 
     @Override
@@ -111,8 +127,8 @@ public class RiderServiceImpl implements RiderService {
     }
 
     @Override
-    public Page<RideDto> getAllMyRides(PageRequest pageRequest) {
-        Rider CurrentRider = getCurrentRider();
+    public Page<RideDto> getAllMyRides(PageRequest pageRequest) throws ResourceNotFoundException {
+        Rider CurrentRider = getCurrentRider(); //This func gives the details of the currentRider loggedIn using SpringSecurityContext.
         return rideService.getAllRidesOfRider(CurrentRider,pageRequest).
                 map(ride -> modelMapper.map(ride,RideDto.class));
     }
@@ -133,8 +149,17 @@ public class RiderServiceImpl implements RiderService {
     //This method will return the current Rider Data so when we implement SpringSecurity then we are going to have the Context of the current User then using that User we can get the Rider
     @Override
     public Rider getCurrentRider() {
-        //TODO -> Implement SpringSecurity
-        return riderRepository.findById(1L).orElseThrow(() ->
-                new ResourceNotFoundException("Rider with given Id not found"+1));
+
+        //TODO -> Implement SpringSecurity , DONE
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return riderRepository.findByUser(user).orElseThrow(() ->
+                new ResourceNotFoundException("Rider not associated with user with given Id: "+1));
+    }
+
+    @Override
+    public UserDto logout() {
+        return null;
     }
 }

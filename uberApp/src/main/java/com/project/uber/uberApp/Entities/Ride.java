@@ -47,7 +47,9 @@ public class Ride {
     //Default FetchType=EAGER but setting LAZY means when we're fetching the RideRequest then it will not fetch the Rider
     private Driver driver;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)//@Enumerated is used to tell JPA how to store an Enum in the DB . By Default , "EnumType.ORDINAL"
+    //like it will store values in form of 0,1,2 but "EnumType.STRING" , it stores the Exact value of enum inside DB and is more preferred
+    //than EnumType.ORDINAL.
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)

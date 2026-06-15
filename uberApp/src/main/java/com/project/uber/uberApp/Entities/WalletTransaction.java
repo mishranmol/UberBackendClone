@@ -33,8 +33,12 @@ public class WalletTransaction {
     //Note-> In production Ready Code there will be a lot of enums.
     private TransactionMethod transactionMethod;
 
-    @OneToOne //If this WalletTransaction is due to Ride so 1To1 Mapping with Ride and if it's not a Ride related Transaction then
-    // this will be null.
+    //Because that one Ride can generate multiple wallet transactions.Example: Suppose a ride fare is ₹500. When the ride completes,
+    // multiple transactions may happen:Ride #101
+// Transaction #1 -> Rider Wallet DEBIT ₹500
+// Transaction #2 -> Driver Wallet CREDIT ₹450
+// Transaction #3 -> Platform Commission CREDIT ₹50 , All these transactions are related to the same Ride #101.
+    @ManyToOne//Many = Transactions , one = Ride
     private Ride ride;
 
     @ManyToOne //One Wallet can have many walletTransactions . So Many walletTransactions are mapped to one Wallet.

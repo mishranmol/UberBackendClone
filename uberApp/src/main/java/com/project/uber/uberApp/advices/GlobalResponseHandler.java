@@ -26,12 +26,26 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                                   ServerHttpRequest request,
                                   ServerHttpResponse response) {
 
-        if(body instanceof ApiResponse<?>){
+        if(body instanceof byte[]) { //added extra else code giving error , not in AnujBhaiya code.
             return body;
         }
+        if(body instanceof ApiResponse<?>){
 
+            //The request is coming from ServerHttpRequest.
+            //When adding Actuator , then we have to return body and don't wrap the body inside API
+            if(request.getURI().getPath().contains("/actuator")) return body;
+
+            //When using Swagger-UI then we'll add below line , which means if the Path of the API contains v3/docs then simply
+            //return the body , don't wrap the body inside ApiResponse.
+            //getPath() -> Gives the String
+            if(request.getURI().getPath().contains("/v3/api-docs")
+                    || request.getURI().getPath().contains("/swagger-ui"))
+            {
+                return body;
+            }
+            return body;
+        }
         return new ApiResponse<>(body);
-
     }
 
 }

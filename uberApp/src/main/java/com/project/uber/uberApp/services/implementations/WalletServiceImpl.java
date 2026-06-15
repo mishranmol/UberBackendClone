@@ -51,7 +51,12 @@ public class WalletServiceImpl implements WalletService {
                 .build();
 
         //This will create a new walletTransaction.
-        walletTransactionService.createNewWalletTransaction(walletTransaction);
+//      walletTransactionService.createNewWalletTransaction(walletTransaction);//This line was giving error.
+// The error was that createNewWalletTransaction is creating a "WalletTransaction" with id=1 and since we are calling walletRepo.save(wallet)
+// so this "wallet" already had a List<WalletTransaction> so this save was trying to apply save on wallet children which is List<WalletTransaction> as well.
+// So walletRepository.save(wallet); will call save method on its children which is wallet.getTransactions().add(walletTransaction);
+
+        wallet.getTransactions().add(walletTransaction);
 
        return walletRepository.save(wallet);
 
@@ -80,7 +85,8 @@ public class WalletServiceImpl implements WalletService {
                 .build();
 
         //This will create a new walletTransaction.
-        walletTransactionService.createNewWalletTransaction(walletTransaction);
+        walletTransactionService.createNewWalletTransaction(walletTransaction); // This was giving some DB error.
+        wallet.getTransactions().add(walletTransaction);
 
         return walletRepository.save(wallet);
     }
@@ -107,7 +113,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Wallet findByUser(User user) {
+    public Wallet findByUser(User user)  {
         return walletRepository.findByUser(user).orElseThrow(
                 () -> new ResourceNotFoundException("Wallet for this user does not exist: "+user.getId())
         );

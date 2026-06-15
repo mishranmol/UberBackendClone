@@ -1,8 +1,6 @@
 package com.project.uber.uberApp.services.implementations;
 
-import com.project.uber.uberApp.Entities.Driver;
-import com.project.uber.uberApp.Entities.Ride;
-import com.project.uber.uberApp.Entities.RideRequest;
+import com.project.uber.uberApp.Entities.*;
 import com.project.uber.uberApp.Entities.enums.RideRequestStatus;
 import com.project.uber.uberApp.Entities.enums.RideStatus;
 import com.project.uber.uberApp.dto.DriverDto;
@@ -10,14 +8,13 @@ import com.project.uber.uberApp.dto.RideDto;
 import com.project.uber.uberApp.dto.RiderDto;
 import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.project.uber.uberApp.repositories.DriverRepository;
-import com.project.uber.uberApp.services.DriverService;
-import com.project.uber.uberApp.services.PaymentService;
-import com.project.uber.uberApp.services.RideRequestService;
-import com.project.uber.uberApp.services.RideService;
+import com.project.uber.uberApp.repositories.RatingRepository;
+import com.project.uber.uberApp.services.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +37,8 @@ public class DriverServiceImpl implements DriverService {
     private final RideService rideService;
     private final ModelMapper modelMapper;
     private final PaymentService paymentService;
+    private final RatingService ratingService;
+    private final RatingRepository ratingRepository;
 
     @Override
     @Transactional // To maintain "Atomicity" -> Either everything will execute or nothing will execute.
@@ -95,6 +94,15 @@ public class DriverServiceImpl implements DriverService {
 
         Ride savedRide = rideService.updateRideStatus(ride,RideStatus.ONGOING);
 
+        //As soon as Driver Starts the ride creating a "Rating" Object , so that while giving rating either to Rider OR Driver we can get this
+        //Rating Object for this particular Ride.
+       Rating rating = Rating.builder()
+                .ride(ride)
+                .rider(ride.getRider())
+                .driver(driver)
+                .build();
+        ratingRepository.save(rating);
+
         //As soon ride is getting Started , creating a Payment Object that is Associated with this Ride.
         paymentService.createNewPayment(savedRide);
 
@@ -137,7 +145,7 @@ public class DriverServiceImpl implements DriverService {
     public RideDto endRide(Long rideId) {
         Ride ride = rideService.getRideById(rideId);
 
-        //Checking if the driver own's this ride or not
+        //Checking if the driver owns this ride or not
         Driver currentDriver = getCurrentDriver();
         if(!currentDriver.equals(ride.getDriver())){
             throw new RuntimeException("This Driver cannot cancel this Ride as he doesn't owns this ride: "+rideId);
@@ -171,7 +179,22 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public RiderDto rateRider(Long rideId, Integer rating) {
-        return null;
+
+        Ride ride = rideService.getRideById(rideId);
+        Driver currentDriver = getCurrentDriver();
+
+        //Checking if the currentDriver owns this ride or not , if not then Driver cannot rate this Rider.
+        if(!ride.getDriver().equals(currentDriver)){
+            throw new RuntimeException("Cannot give the rating as Driver doesn't own's this ride"+currentDriver);
+        }
+
+        //If the ride is not ENDED then driver cannot ride the customer/Rider.
+        if(!ride.getRideStatus().equals(RideStatus.ENDED)){
+            throw new RuntimeException("Driver cannot rate the Rider as Ride is not yet Ended"+ride.getRideStatus());
+        }
+
+        return ratingService.RateRider(ride,rating);
+
     }
 
     //Ques -> So here we are returning "DriverDTO" , but it also has a "UserDto" and other details so how Modelmapper will map UserDto with UserEntity?
@@ -194,7 +217,9 @@ public class DriverServiceImpl implements DriverService {
     @Override
     //TODO -> IMPLEMENTATION USING SPRING SECURITY
     public Driver getCurrentDriver() {
-        return driverRepository.findById(2L).
-                    orElseThrow(()-> new ResourceNotFoundException("Driver with given Id not Found"+2));
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return driverRepository.findByUser(user).orElse(null);
         }
 }
