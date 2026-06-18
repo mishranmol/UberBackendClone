@@ -8,8 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor //This is req. by jackson to create objects
-//This point Dto will contain some Co-ordinates
+@NoArgsConstructor
 public class PointDto {
     private double[] coordinates;
     private String type="Point";//This means the above coordinates belong to Geo-Spatial Point.

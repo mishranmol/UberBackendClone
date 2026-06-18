@@ -21,8 +21,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class RideDto {
 
-    //DTO-> Data Transfer object , used to transfer object b/t different layers so we don't need Jakarta Persistence(JPA)
-    // related annotations in DTO , so copied the entire Ride entity and pasted here.
     private Long id;
 
     private PointDto pickupLocation;

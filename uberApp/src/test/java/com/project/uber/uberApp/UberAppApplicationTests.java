@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest//@SpringBootTest starts the complete Spring Boot application in a test environment so that you can test how multiple components
-//work together.
+@SpringBootTest
 class UberAppApplicationTests {
 
 	@Autowired

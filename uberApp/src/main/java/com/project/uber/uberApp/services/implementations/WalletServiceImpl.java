@@ -27,19 +27,18 @@ public class WalletServiceImpl implements WalletService {
     private final WalletTransactionService walletTransactionService;
     private final ModelMapper modelMapper;
 
-    //transactionId belongs to a payment , if we are making some payment let's say adding money to wallet using "Razorpay".
+
     @Override
-    @Transactional //Adding this as dealing with 2 things here->WalletTransaction & Wallet
+    @Transactional
     public Wallet addMoneyToWallet(User user, Double amount,
                                    String transactionId, Ride ride, TransactionMethod transactionMethod) {
-        //Get the Wallet for this user and then add this amount in their wallet Balance.
+
         Wallet wallet = findByUser(user);
 
        Double newAmount =  wallet.getBalance() + amount ;
        wallet.setBalance(newAmount);
 
-        //Adding/Subtracting money from wallet has to have a transaction Attached to it.
-        //This will create a Transaction Object for us.
+
         WalletTransaction walletTransaction = WalletTransaction
                 .builder()
                 .transactionId(transactionId)
@@ -50,11 +49,6 @@ public class WalletServiceImpl implements WalletService {
                 .amount(amount)
                 .build();
 
-        //This will create a new walletTransaction.
-//      walletTransactionService.createNewWalletTransaction(walletTransaction);//This line was giving error.
-// The error was that createNewWalletTransaction is creating a "WalletTransaction" with id=1 and since we are calling walletRepo.save(wallet)
-// so this "wallet" already had a List<WalletTransaction> so this save was trying to apply save on wallet children which is List<WalletTransaction> as well.
-// So walletRepository.save(wallet); will call save method on its children which is wallet.getTransactions().add(walletTransaction);
 
         wallet.getTransactions().add(walletTransaction);
 
@@ -66,14 +60,12 @@ public class WalletServiceImpl implements WalletService {
     @Transactional
     public Wallet deductMoneyFromWallet(User user, Double amount, String transactionId,
                                         Ride ride, TransactionMethod transactionMethod) {
-        //Find the wallet of this user then subtract this amount from wallet Balance.
+
         Wallet wallet = findByUser(user);
 
         Double left_amount = wallet.getBalance()-amount;
         wallet.setBalance(left_amount);
 
-        //Adding/Subtracting money from wallet has to have a transaction Attached to it.
-        //This will create a Transaction Object for us.
         WalletTransaction walletTransaction = WalletTransaction
                 .builder()
                 .transactionId(transactionId)
@@ -84,7 +76,6 @@ public class WalletServiceImpl implements WalletService {
                 .amount(amount)
                 .build();
 
-        //This will create a new walletTransaction.
         walletTransactionService.createNewWalletTransaction(walletTransaction); // This was giving some DB error.
         wallet.getTransactions().add(walletTransaction);
 
@@ -92,7 +83,6 @@ public class WalletServiceImpl implements WalletService {
     }
 
 
-    //This method will get all money from "wallet" and can be called only by "Driver".
     @Override
     public void withdrawAllMyMoneyFromWallet() {
 //        TODO -> To be implemented
@@ -108,7 +98,6 @@ public class WalletServiceImpl implements WalletService {
     public Wallet createNewWallet(User user) {
          Wallet wallet = new Wallet();
          wallet.setUser(user);
-         //setting the balance 0.0 by default inside entity only.
         return walletRepository.save(wallet);
     }
 

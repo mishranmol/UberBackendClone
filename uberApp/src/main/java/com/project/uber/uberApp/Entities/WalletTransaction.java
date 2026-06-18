@@ -23,29 +23,22 @@ public class WalletTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //Each Transaction has some Amount
+
     private Double amount;
 
-    //Each Transaction has some type --> CREDIT,DEBIT
+
     private TransactionType transactionType;
 
-    //Transaction Method means it's a Banking transaction or RIDE transaction means the customer(Rider) is paying through Wallet.
-    //Note-> In production Ready Code there will be a lot of enums.
+
     private TransactionMethod transactionMethod;
 
-    //Because that one Ride can generate multiple wallet transactions.Example: Suppose a ride fare is ₹500. When the ride completes,
-    // multiple transactions may happen:Ride #101
-// Transaction #1 -> Rider Wallet DEBIT ₹500
-// Transaction #2 -> Driver Wallet CREDIT ₹450
-// Transaction #3 -> Platform Commission CREDIT ₹50 , All these transactions are related to the same Ride #101.
-    @ManyToOne//Many = Transactions , one = Ride
+
+    @ManyToOne
     private Ride ride;
 
-    @ManyToOne //One Wallet can have many walletTransactions . So Many walletTransactions are mapped to one Wallet.
-    // Many=walletTransactions , one=Wallet
+    @ManyToOne
     private Wallet wallet;
 
-    //If it's a banking related transaction then it would have a transactionID or UTR no. something like that.
     private String transactionId;
 
     @CreationTimestamp

@@ -14,7 +14,7 @@ public interface WalletService {
     Wallet deductMoneyFromWallet(User user, Double amount, String transactionId,
                                  Ride ride, TransactionMethod transactionMethod);
 
-    //This method can be called by Driver only.
+    //Method can be called by Driver only.
     void withdrawAllMyMoneyFromWallet();
 
     Wallet findWalletById(Long walletId) throws ResourceNotFoundException;

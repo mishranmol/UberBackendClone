@@ -13,17 +13,13 @@ import com.project.uber.uberApp.strategies.PaymentStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+
+
 //Rider has 232 , Driver has 500
 //Ride cost is 100  , commission = 30
 //Rider -> 232-100
 //Driver -> 500+ (100-30) = 570
 
-
-
-//Note -> Not Integrating Razorpay in this project , just go Through the documentation of Razorpay & there is a Maven Dependency
-//& after adding that Dependency just like you inject any service similarly they have Razorpay Service inject that service &
-//we can call any method at Razorpay .
-// Razorpay is also free , or we can also use "Stripe".
 @Service
 @RequiredArgsConstructor
 public class WalletPaymentStrategy implements PaymentStrategy {
@@ -54,10 +50,8 @@ public class WalletPaymentStrategy implements PaymentStrategy {
                 TransactionMethod.RIDE
         );
 
-        //Confirming paymentStatus after successful payment
          payment.setPaymentStatus(PaymentStatus.CONFIRMED);
          paymentRepository.save(payment);
-
 
     }
 }

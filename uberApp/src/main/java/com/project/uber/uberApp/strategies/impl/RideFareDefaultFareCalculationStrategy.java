@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 public class RideFareDefaultFareCalculationStrategy implements RideFareCalculationStrategy {
 
     private final DistanceService distanceService;
-    //we are passing RideRequest because it has point and RideRequestDto has PointDto so again conversion will be needed.
 
     @Override
     public double calculateFare(RideRequest rideRequest) {

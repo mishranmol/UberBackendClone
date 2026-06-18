@@ -6,16 +6,12 @@ import com.project.uber.uberApp.dto.SignupDto;
 import com.project.uber.uberApp.dto.UserDto;
 import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
 
-//Deals with Authentication Related Concept(i.e->Login, SignUp, Logout)
 public interface AuthService {
 
-    //login will return token
     String[] login(String email, String Password);
 
-    //signup will not require any SpringSecurity concept
     UserDto signup(SignupDto signupDto);
 
-    //Take this userId and make him Driver
     DriverDto onboardNewDriver(Long userId , String vehicleId);
 
     String refreshAccessToken(String refreshToken) throws ResourceNotFoundException;

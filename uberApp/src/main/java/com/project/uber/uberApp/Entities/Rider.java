@@ -17,8 +17,8 @@ public class Rider {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne//Every Rider is a User . Every Rider has exactly one User account.
-    @JoinColumn(name="user_id")//Means Rider table has field named "user_id" and this field will be ForeignKey for User table .
+    @OneToOne
+    @JoinColumn(name="user_id")
 
     private User user;
 

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor // This will create a constructor on our behalf.No need to create Manually
+@RequiredArgsConstructor
 public class RatingServiceImpl implements RatingService {
 
     private final RatingRepository ratingRepository;
@@ -26,35 +26,29 @@ public class RatingServiceImpl implements RatingService {
     private final RiderRepository riderRepository;
     private final ModelMapper modelMapper;
 
-    //We should create a Rating Object As soon as we start the Ride.
-    @Override
+
+     @Override
     public DriverDto RateDriver(Ride ride , Integer rating) {
 
         Driver driver = ride.getDriver();
 
-        //Getting the Rating for a particular Ride.
         Rating ratingObj = ratingRepository.findByRide(ride).
                 orElseThrow( () -> new ResourceNotFoundException("Rating not found for ride with Id:"+ride.getId()));
 
-        //Checking if the Driver has already got the Rating for this particular Ride , then Rider cannot rate the Driver again for this Ride.
+
         if(ratingObj.getDriverRating()!=null){
             throw new RuntimeException("Driver has already been rated, cannot rate again: "+ratingObj.getDriverRating());
         }
 
-        //Giving Rating to Driver for this particular Ride.
         ratingObj.setDriverRating(rating);
         ratingRepository.save(ratingObj);
 
-        //Calculating the Avg. rating of Driver for all his rides.
       Double newRating =  ratingRepository.findByDriver(driver)
                 .stream()
-                .mapToDouble(rating1 -> rating1.getDriverRating())//mapToDouble() is a Java Stream method that converts a stream
-                //of objects into a stream of primitive double values (DoubleStream) so numerical operations like sum(), average(), min(),
-                //and max() can be performed. InShort->mapToDouble() convert stream to DoubleStream so we can perform operations(sum,avg) easily.
-               //Note -> We can also use Map(i.e->.map()) method here but then we can't use sum() directly.
+                .mapToDouble(rating1 -> rating1.getDriverRating())
                 .average().orElse(0.0);
 
-      driver.setRating(newRating);//Setting the "newRating = sum of all old Rating + This ride Rating"
+      driver.setRating(newRating);
       Driver savedDriver = driverRepository.save(driver);
 
       return modelMapper.map(savedDriver,DriverDto.class);
@@ -62,39 +56,31 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
-    //We have created a Rating Object As soon as we start the Ride.
     public RiderDto RateRider(Ride ride, Integer rating) {
 
         Rider rider = ride.getRider();
 
-        //Getting the Rating for a particular Ride.
+
         Rating ratingObj = ratingRepository.findByRide(ride).
                 orElseThrow( () -> new ResourceNotFoundException("Rating not found for ride with Id:"+ride.getId()));
 
-        //Checking if the Rider has already got the Rating for this particular Ride , then Driver cannot rate the Rider again for this Ride.
         if(ratingObj.getRiderRating()!=null){
             throw new RuntimeException("Rider has already been rated, cannot rate again: "+ratingObj.getDriverRating());
         }
 
-        //Giving Rating to Rider for this particular Ride.
         ratingObj.setRiderRating(rating);
         ratingRepository.save(ratingObj);
 
-        //Calculating the Avg. rating of Rider for all his rides.
+
         Double newRating =  ratingRepository.findByRider(rider)
                 .stream()
-                .mapToDouble(rating1 -> rating1.getRiderRating())//mapToDouble() is a Java Stream method that converts a stream
-                //of objects into a stream of primitive double values (DoubleStream) so numerical operations like sum(), average(), min(),
-                //and max() can be performed. InShort->mapToDouble() convert stream to DoubleStream so we can perform operations(sum,avg) easily.
-                //Note -> We can also use Map(i.e->.map()) method here but then we can't use sum() directly.
+                .mapToDouble(rating1 -> rating1.getRiderRating())
                 .average().orElse(0.0);
 
         rider.setRating(newRating);//Setting the "newRating = sum of all old Rating + This ride Rating"
         Rider savedRider = riderRepository.save(rider);
 
         return  modelMapper.map(savedRider,RiderDto.class);
-
-
 
     }
 }

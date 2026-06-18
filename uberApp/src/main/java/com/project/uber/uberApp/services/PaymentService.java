@@ -8,7 +8,7 @@ public interface PaymentService {
 
     Payment createNewPayment(Ride ride);
 
-    //It will be related to any payment like banking etc. and not just ride payment.
+
     void processPayment(Ride ride);
 
     void updatePaymentStatus(Payment payment , PaymentStatus paymentStatus);

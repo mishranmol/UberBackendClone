@@ -12,11 +12,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RideFareSurgePricingFareCalculationStrategy implements RideFareCalculationStrategy {
 
-    //SURGE means "sudden large increase".
     private final DistanceService distanceService;
 
-    // This SURGE_FACTOR can depend on lot of factors in real world Scenario like if raining then this factor can be different ,
-    // we can call an Free weather API and this SURGE_FACTOR would be different then.
     private static final double SURGE_FACTOR = 2 ;
 
     @Override

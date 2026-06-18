@@ -31,9 +31,6 @@ import java.util.List;
 @Slf4j
 public class RiderServiceImpl implements RiderService {
 
-    // Using "final" so that no one can change that thing anywhere inside the application but if we will use @Autowired so there will
-    // be no "final" hence we use "Constructor Injection" rather than @Autowired.
-    // Rather can writing the Constructor we will use @RequiredArgsConstructor which will create Constructor for us so no need to write manually.
 
     private final ModelMapper modelMapper;
     private  final RideStrategyManager rideStrategyManager;
@@ -45,14 +42,11 @@ public class RiderServiceImpl implements RiderService {
     private final JWTService jwtService;
 
     @Override
-    @Transactional//To maintain "Atomicity" -> Either Everything will execute or Nothing will execute.By Adding @Trans.
-    //the whole method comes under a Transaction Context so if anything fails or goes Wrong then everything RollsBack.
+    @Transactional
     public RideRequestDto requestRide(RideRequestDto rideRequestDto){
 
         RideRequest rideRequest = modelMapper.map(rideRequestDto,RideRequest.class);
-//      log.info(rideRequest.toString()); after putting the breakpoint we can to know that modelmapper is not able to fill the
-// pickupLocation/dropOffLocation because in Entity it's Point but in rideRequestDto it's PointDto so it was unable to convert
-// these two so we have to make some configuration changes in our modelmapper like ->  modelMapper.typeMap...
+
         rideRequest.setRideRequestStatus(RideRequestStatus.PENDING);
         Rider rider = getCurrentRider();
         rideRequest.setRider(rider);
@@ -60,18 +54,13 @@ public class RiderServiceImpl implements RiderService {
        Double fare = rideStrategyManager.rideFareCalculationStrategy().calculateFare(rideRequest);
        rideRequest.setFare(fare);
 
-        //No matter we get the driver or not , we'll save our RideRequest
         RideRequest savedRideRequest = rideRequestRepository.save(rideRequest);
 
-        //This will broadcast a msg to all the drivers who are matched so we can't do anything with this because now it's totally
-        //Up to the drivers that whether they will accept/reject this particulate rideRequest.
 
       List<Driver> drivers =  rideStrategyManager.driverMatchingStrategy(rider.getRating()).
               findMatchingDriver(rideRequest);
         //Todo -> Send Notifications to all drivers regarding this rideRequest
 
-        // Currently the rideRequest which is returned has status=PENDING, this will be moved to "CONFIRMED" once driver accepts
-        // this ride request so this will come under driver's method of accepting the request.
        return modelMapper.map(savedRideRequest,RideRequestDto.class);
 
     }
@@ -82,12 +71,12 @@ public class RiderServiceImpl implements RiderService {
         Rider currentRider = getCurrentRider();
         Ride currentRide = rideService.getRideById(rideId);
 
-        //Checking if this rider owns this Ride
+
         if(!currentRide.getRider().equals(currentRider)){
             throw new RuntimeException("Not allowed to cancel as Rider does not own this ride with id: "+rideId);
         }
 
-        //Rider only allowed to cancel if status="CONFIRMED"
+
         if(!currentRide.getRideStatus().equals(RideStatus.CONFIRMED)){
             throw new RuntimeException("Ride cannot be cancelled, invalid status: "+currentRide.getRideStatus());
         }
@@ -107,12 +96,12 @@ public class RiderServiceImpl implements RiderService {
 
         Rider currentRider = getCurrentRider();
 
-        //Checking if the currentDriver owns this ride or not , if not then Driver cannot rate this Rider.
+
         if(!ride.getRider().equals(currentRider)){
             throw new RuntimeException("Cannot give the rating as Driver doesn't own's this ride"+currentRider);
         }
 
-        //If the ride is not ENDED then Rider cannot ride the Driver.
+
         if(!ride.getRideStatus().equals(RideStatus.ENDED)){
             throw new RuntimeException("Driver cannot rate the Rider as Ride is not yet Ended"+ride.getRideStatus());
         }
@@ -128,25 +117,23 @@ public class RiderServiceImpl implements RiderService {
 
     @Override
     public Page<RideDto> getAllMyRides(PageRequest pageRequest) throws ResourceNotFoundException {
-        Rider CurrentRider = getCurrentRider(); //This func gives the details of the currentRider loggedIn using SpringSecurityContext.
+        Rider CurrentRider = getCurrentRider();
         return rideService.getAllRidesOfRider(CurrentRider,pageRequest).
                 map(ride -> modelMapper.map(ride,RideDto.class));
     }
 
     @Override
     public Rider createNewRider(User user) {
-        //Using builder pattern to create a Rider , so adding @Builder inside Rider entity.
-        //We would have also used Rider rider = new Rider();
         Rider rider = Rider.
                 builder().
                 user(user).
                 rating(0.0).
                 build();
-        riderRepository.save(rider); //After creating a New Rider , saving its details inside DB.
+        riderRepository.save(rider);
         return rider;
     }
 
-    //This method will return the current Rider Data so when we implement SpringSecurity then we are going to have the Context of the current User then using that User we can get the Rider
+
     @Override
     public Rider getCurrentRider() {
 

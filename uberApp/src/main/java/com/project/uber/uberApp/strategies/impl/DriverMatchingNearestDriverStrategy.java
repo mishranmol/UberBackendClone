@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-//All the business logic needs to be inside Service
+
 @Service
 @RequiredArgsConstructor
 public class DriverMatchingNearestDriverStrategy implements DriverMatchingStrategy {
@@ -18,8 +18,7 @@ public class DriverMatchingNearestDriverStrategy implements DriverMatchingStrate
     private final DriverRepository driverRepository;
     @Override
     public List<Driver> findMatchingDriver(RideRequest rideRequest) {
-        //We'll be creating custom method inside the Repository that will have custom Query which will work on our Geo-Spatial DB
-        //Only pass the Pickup location
+
         return driverRepository.findTenNearestDrivers(rideRequest.getPickupLocation());
 
     }

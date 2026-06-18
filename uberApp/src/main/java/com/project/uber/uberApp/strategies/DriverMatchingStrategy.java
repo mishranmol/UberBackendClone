@@ -8,8 +8,7 @@ import java.util.List;
 
 public interface DriverMatchingStrategy {
 
-    // We were passing "RideRequestDto" but now we are passing "RideRequest" because it contains more info. than Dto and since it's an
-    // internal method so we can pass it.
+
     List<Driver> findMatchingDriver(RideRequest rideRequest);
 
 }

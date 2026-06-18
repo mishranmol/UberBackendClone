@@ -25,7 +25,6 @@ public class RideRequestServiceImpl implements RideRequestService {
 
     @Override
     public void update(RideRequest rideRequest) {
-        //We are not creating a new RideRequest , we are just updating the rideRequest
         rideRequestRepository.findById(rideRequest.getId()).
                     orElseThrow(() -> new ResourceNotFoundException("RideRequest not found with id : "+rideRequest.getId()));
         rideRequestRepository.save(rideRequest);

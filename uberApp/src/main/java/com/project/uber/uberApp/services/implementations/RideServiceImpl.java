@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.Random;
 
 @Service
-@RequiredArgsConstructor//This will create a Constructor on our behalf , we don't have to create it manually then.
+@RequiredArgsConstructor
 public class RideServiceImpl implements RideService {
 
     private final RideRepository rideRepository;
@@ -38,20 +38,19 @@ public class RideServiceImpl implements RideService {
     @Override
     public Ride createNewRide(RideRequest rideRequest, Driver driver) {
 
-        //Set the status as CONFIRMED as driver accepted the rideRequest
+
         rideRequest.setRideRequestStatus(RideRequestStatus.CONFIRMED);
 
-        //Since mostly fields b/t rideRequest & Ride are Similar so using ModelMapper to convert rideRequest into Ride
+
        Ride ride = modelMapper.map(rideRequest,Ride.class);
        ride.setRideStatus(RideStatus.CONFIRMED);
        ride.setDriver(driver);
        ride.setOtp(generateRandomOTP());
-       ride.setId(null); //Don't know the logic behind this
+       ride.setId(null);
 
-        //
+
         rideRequestService.update(rideRequest);
 
-       //Saving Ride inside our DB
        return rideRepository.save(ride);
 
     }
@@ -73,12 +72,11 @@ public class RideServiceImpl implements RideService {
     }
 
 
-    //Going to generate 4 Digit Random OTP
     private String generateRandomOTP(){
         Random random = new Random();
         int otp = random.nextInt(10000); //It will give us Random Number b/t 0->9999.
-        return String.format("%04d",otp); //String.format("%04d", otp) is used to convert a number into a 4-digit string, adding leading zeros
-        // if necessary. Example : int otp = 7; String result = String.format("%04d", otp); Output : 0007
+        return String.format("%04d",otp); //String.format("%04d", otp) is used to convert a number into a 4-digit
+        // string, adding leading zeros,if necessary.Example : int otp = 7; String result = String.format("%04d", otp); Output : 0007
 
     }
 }

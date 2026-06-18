@@ -174,11 +174,3 @@ values
 
 
 
-
---Note -> Don't pass the IDs in any table HERE while inserting data in DB as in each entity/table we have set the "GenerationType.IDENTITY" for ID,
---so this will increment the count of ID every time a new Entry is inserted inside DB so no need to add the ID HERE ITSELF , else it will give error
---in future . Example-> We have inserted a user with ID=1 here in data.sql file, in future if we try to save any user inside user_table then
--- it will create a user with ID=1 only because since GenerationType.IDENTITY for ID we have used so it doesn't work like if we have
---given 5 users here in data.sql file with respective IDs as 1,2,3,4,5 so while inserting new user in future inside DB it will not create with
---ID=6 as 1-5 we have already used , instead of that it will create with ID=1 only , so we have faced this issue while creating this Project and inserting
---ID inside data.sql file.

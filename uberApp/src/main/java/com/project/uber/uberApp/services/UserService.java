@@ -13,10 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-//NOTE ->  private final UserRepository userRepository;
-//If we are Using @RequiredArgsConstructor to inject the constructor but if we'll remove "final" Keyword from above line then it will give error
-//because @RequiredArgsConstructor only generates a constructor for fields that are marked as "final" or marked with "@NonNull".
-
     private final UserRepository userRepository;
 
     @Override

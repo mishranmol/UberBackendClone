@@ -18,10 +18,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentStrategyManager paymentStrategyManager;
 
-    //In payment, we can have a PaymentStrategy and using that Strategy we can process the payment depending upon paymentMethodType.
     @Override
     public void processPayment(Ride ride) {
-        //Payment has Ride, but Ride does not have Payment.
         Payment payment = paymentRepository.findByRide(ride)
                 .orElseThrow(() ->  new ResourceNotFoundException("Payment not found for Ride: "+ride.getId()));
       PaymentStrategy paymentStrategy = paymentStrategyManager.paymentStrategy(payment.getPaymentMethod());

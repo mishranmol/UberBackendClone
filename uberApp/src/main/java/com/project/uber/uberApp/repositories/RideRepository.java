@@ -12,12 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RideRepository extends JpaRepository<Ride,Long> {
 
-    //These methods will be created automatically by SpringData JPA and corresponding Queries are created by Hibernate.
-
-    //Passed as "Pageable pageRequest" , as pageRequest is Implementation of Pageable.
     Page<Ride> findByRider(Rider rider, PageRequest pageRequest);
 
-    //Passed as "Pageable pageRequest", as pageRequest is Implementation of Pageable.
     Page<Ride> findByDriver(Driver driver, Pageable pageRequest);
 
 }

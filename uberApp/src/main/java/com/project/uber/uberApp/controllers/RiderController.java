@@ -12,15 +12,13 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path="/riders") //Global Path would be "/rider"
+@RequestMapping(path="/riders")
 @RequiredArgsConstructor
 @Secured("ROLE_RIDER")
-//Note-> Before using @Secured, you must enable method-level security : @EnableMethodSecurity(securedEnabled = true) public class WebSecurityConfig {}
-//inside WebSecurityConfig file else Spring will ignore all @Secured annotations.
 public class RiderController {
 
-    //Since we have declared RiderService as Required(i.e. As declared as final)
-    private final RiderService riderService; //We can define a constructor manually or else we can write as @RequiredArgsConstructor
+
+    private final RiderService riderService;
 
     @PostMapping(path="/requestRide")
     public ResponseEntity<RideRequestDto> requestRide(@RequestBody RideRequestDto rideRequestDto){
@@ -42,22 +40,16 @@ public class RiderController {
         return ResponseEntity.ok(riderService.getMyProfile());
     }
 
-    //@RequestParam is used to extract query parameter values from the URL and bind them to method parameters in Spring Boot controller.
-    //http://localhost:8080/search?name=Anmol&age=25 ,
-    //@GetMapping("/search")
-    //public String search(@RequestParam String name , @RequestParam Integer age) { return name + " " + age; }
-    //PageRequest is made up of 2 things -> "PageNumber" → which page you want
-    //  &  "PageSize" → how many records per page.
+
     @GetMapping(path = "/getAllMyRides")
     public ResponseEntity<Page<RideDto>> getAllMyRides(@RequestParam(defaultValue = "0") Integer pageNumber,
                                                        @RequestParam(defaultValue = "10" , required = false)
                                                        Integer pageSize) //By default, required is "true" so making it false.
     {
-        //Note -> Inside "PageRequest.of" we can also pass the "Sort.by" if we want our Data to be sorted acc. to some specific field.
+
         PageRequest pageRequest = PageRequest.of(pageNumber,pageSize,
-                Sort.by(Sort.Direction.DESC,"createdTime","id")); //Sort by "createdTime" field in descending order.If 2 records
-        //have the same "createdTime" , then sort by "id" field in descending order as well.
-        //Note-> We are passing "createdTime" & "id" since both these fields are part of RideDto.
+                Sort.by(Sort.Direction.DESC,"createdTime","id"));
+
         return ResponseEntity.ok(riderService.getAllMyRides(pageRequest));
     }
 

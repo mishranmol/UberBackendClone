@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-//StrategyManager responsibility is to give you which strategy to use DriverMatchingStrategy & RideFareCalculationStrategy
 @Component
 @RequiredArgsConstructor
 public class RideStrategyManager {
@@ -31,7 +30,6 @@ public class RideStrategyManager {
 
     public RideFareCalculationStrategy rideFareCalculationStrategy(){
 
-        //SURGE means "sudden large increase"
         //Suppose the SurgeTime is Between 6PM to 9PM
         LocalTime surgeStartTime = LocalTime.of(18,0);
         LocalTime surgeEndTime = LocalTime.of(21,0);

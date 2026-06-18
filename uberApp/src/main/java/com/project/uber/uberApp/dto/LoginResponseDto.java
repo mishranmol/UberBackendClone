@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginResponseDto {
     private String accessToken;
-//    private String refreshToken; //refreshToken will be passed to you inside cookies.
 }

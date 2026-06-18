@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-//Note -> Jo Bhi hamari Entity ka naam hoga wahi cheez hum logo ko return mai milegi , jaise yeah Entity ka naam Rating hai toh query
-//karna par response mai Rating hi milega kuki Entity is a table inside DB so whatever DB operation we'll execute would take place inside that table/Entity only.
 public interface RatingRepository extends JpaRepository<Rating,Long> {
 
     List<Rating> findByRider(Rider rider);

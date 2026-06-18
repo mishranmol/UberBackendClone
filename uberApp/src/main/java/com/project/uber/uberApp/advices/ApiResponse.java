@@ -5,7 +5,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-//This will return if API is running fine
 public class ApiResponse<T> {
 
     private LocalDateTime timestamp;
@@ -15,8 +14,7 @@ public class ApiResponse<T> {
     private  ApiError error;
 
 
-    //Default constructor
-    //This will create timestamp for every response
+    //It will create timestamp for every response
     public ApiResponse() {
         this.timestamp = LocalDateTime.now();
     }

@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/uberApp.iml" filepath="$PROJECT_DIR$/.idea/uberApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/UberBackendClone.iml" filepath="$PROJECT_DIR$/.idea/UberBackendClone.iml" />
+      <module fileurl="file://$PROJECT_DIR$/uberApp/uberApp.iml" filepath="$PROJECT_DIR$/uberApp/uberApp.iml" />
     </modules>
   </component>
 </project>
