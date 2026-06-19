@@ -17,6 +17,9 @@ import com.project.uber.uberApp.services.AuthService;
 import com.project.uber.uberApp.services.RiderService;
 import com.project.uber.uberApp.services.UserService;
 import com.project.uber.uberApp.services.WalletService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +29,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.Set;
 
 import static com.project.uber.uberApp.Entities.enums.Role.DRIVER;
@@ -127,6 +132,39 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findById(userId).
                 orElseThrow(() -> new ResourceNotFoundException("user not found with Id: "+userId));
         return jwtService.generateAccessToken(user);
+
+    }
+
+    @Override
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+
+        //Getting the array of Cookie Object.
+        Cookie[] cookies = request.getCookies();
+
+        //Iterating over each cookie Object
+        Cookie refreshTokenCookie = Arrays.stream(cookies)
+                .filter(cookie1 -> cookie1.getName().equals("refreshToken"))//It checks each cookie’s name and returns
+                // only the cookie whose name matches "refreshToken".
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Respective refreshToken cookie not found"));
+
+        String refreshToken = refreshTokenCookie.getValue();
+
+
+        Long userId = jwtService.getUserIdFromToken(refreshToken);
+        User user = userRepository.findById(userId).
+                orElseThrow(() -> new ResourceNotFoundException("User with given Id not exists: "+userId));
+
+        user.setLogoutTime(Instant.now());
+        userRepository.save(user);
+
+        Cookie cookie = new Cookie("refreshToken","");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0); // expire immediately
+
+        response.addCookie(cookie);
+
+        return "User Logged Out Successfully";
 
     }
 }

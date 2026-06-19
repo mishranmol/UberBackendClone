@@ -5,6 +5,8 @@ import com.project.uber.uberApp.dto.LoginResponseDto;
 import com.project.uber.uberApp.dto.SignupDto;
 import com.project.uber.uberApp.dto.UserDto;
 import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
 
@@ -14,5 +16,7 @@ public interface AuthService {
 
     DriverDto onboardNewDriver(Long userId , String vehicleId);
 
-    String refreshAccessToken(String refreshToken) throws ResourceNotFoundException;
+    String refreshAccessToken(String refreshToken);
+
+    String logout(HttpServletRequest request, HttpServletResponse response);
 }

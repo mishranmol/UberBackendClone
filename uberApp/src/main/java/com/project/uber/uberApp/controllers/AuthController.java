@@ -64,4 +64,11 @@ public class AuthController {
                 HttpStatus.CREATED);
     }
 
+
+    @PostMapping(path = "/logout")
+    public ResponseEntity<LogoutDto> logout(HttpServletRequest request , HttpServletResponse response){
+        String str = authService.logout(request,response);
+        return ResponseEntity.ok(new LogoutDto(str));
+    }
+
 }

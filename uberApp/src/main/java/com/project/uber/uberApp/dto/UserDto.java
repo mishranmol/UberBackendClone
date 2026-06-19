@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.Set;
 
 @Getter
@@ -18,5 +19,6 @@ public class UserDto {
     private String name;
     private String email;
     private Set<Role> roles;
+    private Instant logoutTime;
 
 }
